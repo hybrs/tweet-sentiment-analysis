@@ -14,11 +14,12 @@ import preprocessor as p
 import operator
 import pickle
 import time
+from sklearn    .metrics import f1_score, accuracy_score
 
 MAX_SEQUENCE_LENGTH = 40
 MAX_NUM_WORDS = 40000
-N_FOLD = 2
-N_REPEAT = 1
+N_FOLD = 5
+N_REPEAT = 3
 
 train_data = pickle.load(open("data/train_data", "rb"))
 train_labels = pickle.load(open("data/train_labels", "rb"))
@@ -29,10 +30,7 @@ ep = 2
 n_filter = (100, 100, 100)
 ker_size = (2, 3, 4)
 
-
-
-
-def macroaveraged_recall(y_true, y_pred):
+def score_(y_true, y_pred, scorer):
     """
     Compute recall for each class and average the result (see SemEval2017)
     :return: macroaveraged_recall.
@@ -46,7 +44,7 @@ def macroaveraged_recall(y_true, y_pred):
             true_vects[j].append(y_true[i][j])
             pred_vects[j].append(y_pred[i][j])
     
-    recalls = [ recall_score(true_vects[i], pred_vects[i]) for i in range(n_class)]
+    recalls = [ scorer(true_vects[i], pred_vects[i]) for i in [0,2]]
     return recalls, np.average(recalls)
 
 def get_test_data(test_sents, tokenizer, word_index):
@@ -134,9 +132,20 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
     step_tot = 0
     step_avg = []
     step_std = []
-    fold_res = []
+
+    functions=dict({
+        'accuracy' : accuracy_score,
+        'f1' : f1_score,
+        'mavg_recall': recall_score
+        })
+    scores = dict({
+        'accuracy': [],
+        'f1': [],
+        'mavg_recall': []
+        })
+
     for it in range(n_repeat):
-        fold_res.append([])
+        #fold_res.append([])
         for i in range(1, n_fold+1):
             x_train, y_train, x_val, y_val = train_test_split_cv(x, y, i, n_fold=n_fold)
             
@@ -148,18 +157,19 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
             
             step_tot+=1
             y_pred = to_category(model.predict(x_val, batch_size = batch_size))
-            garb, mavg = macroaveraged_recall(y_val, y_pred)#, categorical_accuracy(y_val, y_pred)
-            
+
+            for key in functions.keys():
+                scores[key].append(score_(y_val, y_pred, functions.get(key))[1])
+                    
             if i == 1:
                 print("\n")
-            print("["+str(time.asctime())+"] Step #"+str(it+1)+"."+str(i)+" ("+str(step_tot)+"/"+str(n_repeat*n_fold)+") mavg_recall on validation = "+str(mavg)[:5])#+" - ca = "+str(ca))
+            print("["+str(time.asctime())+"] Step #"+str(it+1)+"."+str(i)+" ("+str(step_tot)+"/"+str(n_repeat*n_fold)+") mavg_recall on validation = "+str(scores['mavg_recall'][-1])[:5] + " accuracy on validation = "+str(scores['accuracy'][-1])[:5] + " f1 on validation = "+str(scores['f1'][-1])[:5])#+" - ca = "+str(ca))
             print("---------------------------------------------------------------------------------")
             
-            fold_res[it].append(mavg)
+            #fold_res[it].append(mavg)
             
             del model
             del y_pred
-            del garb
             del x_train
             del y_train
             del x_val
@@ -167,13 +177,13 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
             
             gc.collect()
 
-        step_avg.append(np.average(fold_res[it]))
-        step_std.append(np.std(fold_res[it])) 
+        #step_avg.append(np.average(fold_res[it]))
+        #step_std.append(np.std(fold_res[it])) 
                         
-        print("\n--------------------------------> Average mavg_recall at step #"+str(it+1)+" = "+str(step_avg[it])[:5]+" +/-"+str(step_std[it])[:5]+"<-------------------------------")
-        results.append(step_avg[it])
+        #print("\n--------------------------------> Average mavg_recall at step #"+str(it+1)+" = "+str(step_avg[it])[:5]+" +/-"+str(step_std[it])[:5]+"<-------------------------------")
+        #results.append(step_avg[it])
     
-    return fold_res
+    return scores
 
 def create_model(kernel_size = (2, 3, 4), n_filter = (100, 100, 100), dropout = 0.):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
@@ -181,8 +191,6 @@ def create_model(kernel_size = (2, 3, 4), n_filter = (100, 100, 100), dropout = 
                               input_length=MAX_SEQUENCE_LENGTH, trainable=True)(tweet_input)
     
     conv_branches = []
-
-
 
     for k in range(len(kernel_size)):
         conv_branches.append(Conv1D(filters=n_filter[k], kernel_size=kernel_size[k], padding='valid', activation='relu', strides=1)(tweet_encoder))
@@ -258,7 +266,10 @@ print("\n=======================================================================
 
 res = cross_validation(train_data, train_labels, n_fold = N_FOLD, n_repeat = N_REPEAT, **params)
 print("\n=================================================================================================================\n")
-print("["+str(time.asctime())+"] completed a "+str(N_FOLD)+"-fold cv with "+model_tag)
+print("["+str(time.asctime())+"] completed a "+str(N_FOLD)+"-fold cv with "+model_tag+
+    "\n mavg_recall on validation = "+str(np.average(res['mavg_recall']))[:5] + "+/-"+str(np.std(res['mavg_recall']))[:5] 
+    +" accuracy on validation = "+str(np.average(res['accuracy']))[:5] + "+/-"+str(np.std(res['accuracy']))[:5]+ 
+    " f1 on validation = "++str(np.average(res['f1']))[:5] + "+/-"+str(np.std(res['f1']))[:5])
 
 cv_result = dict({model_tag:res})
 

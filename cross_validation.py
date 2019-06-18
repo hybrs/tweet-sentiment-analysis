@@ -14,7 +14,7 @@ import preprocessor as p
 import operator
 import pickle
 import time
-from sklearn    .metrics import f1_score, accuracy_score
+from sklearn.metrics import f1_score, accuracy_score
 
 MAX_SEQUENCE_LENGTH = 40
 MAX_NUM_WORDS = 40000

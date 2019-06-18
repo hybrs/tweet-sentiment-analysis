@@ -269,7 +269,7 @@ print("\n=======================================================================
 print("["+str(time.asctime())+"] completed a "+str(N_FOLD)+"-fold cv with "+model_tag+
     "\n mavg_recall on validation = "+str(np.average(res['mavg_recall']))[:5] + "+/-"+str(np.std(res['mavg_recall']))[:5] 
     +" accuracy on validation = "+str(np.average(res['accuracy']))[:5] + "+/-"+str(np.std(res['accuracy']))[:5]+ 
-    " f1 on validation = "++str(np.average(res['f1']))[:5] + "+/-"+str(np.std(res['f1']))[:5])
+    " f1 on validation = "+str(np.average(res['f1']))[:5] + "+/-"+str(np.std(res['f1']))[:5])
 
 cv_result = dict({model_tag:res})
 

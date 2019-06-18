@@ -16,14 +16,20 @@ import pickle
 import time
 
 MAX_SEQUENCE_LENGTH = 40
-MAX_NUM_WORDS = 90000 #93428
-EMBEDDING_DIM = 200
-
-N_FOLD = 5
+MAX_NUM_WORDS = 40000
+N_FOLD = 2
 N_REPEAT = 1
 
 train_data = pickle.load(open("data/train_data", "rb"))
 train_labels = pickle.load(open("data/train_labels", "rb"))
+
+emb_path = "data/embedding_matrix"
+batch_sz = 32
+ep = 2
+n_filter = (100, 100, 100)
+ker_size = (2, 3, 4)
+
+
 
 
 def macroaveraged_recall(y_true, y_pred):
@@ -129,7 +135,6 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
     step_avg = []
     step_std = []
     fold_res = []
-    
     for it in range(n_repeat):
         fold_res.append([])
         for i in range(1, n_fold+1):
@@ -138,15 +143,17 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
             model = create_model(kernel_size = ks, n_filter = nf, dropout = dropout)
 
             model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=0)
-            #predict + scoring su test/validation
+            
+            #predict + MULTIPLE scoring su test/validation
             
             step_tot+=1
             y_pred = to_category(model.predict(x_val, batch_size = batch_size))
             garb, mavg = macroaveraged_recall(y_val, y_pred)#, categorical_accuracy(y_val, y_pred)
             
-            print("############################################################################")
+            if i == 1:
+                print("\n")
             print("["+str(time.asctime())+"] Step #"+str(it+1)+"."+str(i)+" ("+str(step_tot)+"/"+str(n_repeat*n_fold)+") mavg_recall on validation = "+str(mavg)[:5])#+" - ca = "+str(ca))
-            print("############################################################################")
+            print("---------------------------------------------------------------------------------")
             
             fold_res[it].append(mavg)
             
@@ -162,7 +169,8 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
 
         step_avg.append(np.average(fold_res[it]))
         step_std.append(np.std(fold_res[it])) 
-        print("==============================> Average mavg_recall at step #"+str(it+1)+" = "+str(step_avg[it])[:5]+" +/-"+str(step_std[it])[:5]+"<===============================")
+                        
+        print("\n--------------------------------> Average mavg_recall at step #"+str(it+1)+" = "+str(step_avg[it])[:5]+" +/-"+str(step_std[it])[:5]+"<-------------------------------")
         results.append(step_avg[it])
     
     return fold_res
@@ -209,12 +217,6 @@ def switch_param(argument, val):
         return
 
 def get_param():
-    emb_path = "data/embedding_matrix"
-    batch_sz = 32
-    ep = 2
-    n_filter = (100, 100, 100)
-    ker_size = (2, 3, 4)
-
     params = dict({
             "batch_size":batch_sz,
             "epochs":ep,
@@ -225,13 +227,15 @@ def get_param():
         })
 
     if len(sys.argv) > 1:
+        print("=========================================\n\nCV parameters:")
         for ar in sys.argv[1:]:
-            print(switch_param(ar[0], ar[1:]))
-            params.update(switch_param(ar[0], ar[1:]))
+            param = switch_param(ar[0], ar[1:])
+            print(param)
+            params.update(param)
         
     embedding_matrix = pickle.load(open(emb_path+params.get('embedding'), "rb"))   
     
-    return params, embedding_matrix 
+    return params, embedding_matrix
 
 
 params, embedding_matrix = get_param()
@@ -249,12 +253,13 @@ if len(kernel_size) != len(n_filter):
 
 model_tag = "b"+str(batch_size)+"-e"+str(epochs)+"-n"+str(n_filter)+"-k"+str(kernel_size)+"-x"+str(embedding)
 
-print("["+str(time.asctime())+"] Started a "+str(N_FOLD)+"-fold cv with "+model_tag)
+print("\n["+str(time.asctime())+"] Started a "+str(N_FOLD)+"-fold cv with "+model_tag)
+print("\n==================================================================================================\n")
 
 res = cross_validation(train_data, train_labels, n_fold = N_FOLD, n_repeat = N_REPEAT, **params)
-
+print("\n=================================================================================================================\n")
 print("["+str(time.asctime())+"] completed a "+str(N_FOLD)+"-fold cv with "+model_tag)
 
 cv_result = dict({model_tag:res})
 
-pickle.dump(file=open('cv_result_'+model_tag, 'wb'), obj=cv_result)
+pickle.dump(file=open('cv_result/cv_result_'+model_tag, 'wb'), obj=cv_result)

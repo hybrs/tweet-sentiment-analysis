@@ -30,7 +30,7 @@ ep = 2
 n_filter = (100, 100, 100)
 ker_size = (2, 3, 4)
 
-def score_(y_true, y_pred, scorer):
+def score_(y_true, y_pred, scorer, PN_only=False):
     """
     Compute recall for each class and average the result (see SemEval2017)
     :return: macroaveraged_recall.
@@ -44,8 +44,9 @@ def score_(y_true, y_pred, scorer):
             true_vects[j].append(y_true[i][j])
             pred_vects[j].append(y_pred[i][j])
     
-    recalls = [ scorer(true_vects[i], pred_vects[i]) for i in [0,2]]
-    return recalls, np.average(recalls)
+    recalls = [ scorer(true_vects[i], pred_vects[i]) for i in [0,1,2]]
+    avg_ret = np.average(recalls) if not PN_only else np.average(np.array(recalls[0], recalls[2])) 
+    return recalls, avg_ret
 
 def get_test_data(test_sents, tokenizer, word_index):
     test_text = []
@@ -127,6 +128,7 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
     nf = params.get('n_filter')
     dropout = params.get('dropout')
     emb = params.get('embedding')
+    act = params.get('activation')
     
     #random seed init
     step_tot = 0
@@ -149,7 +151,7 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
         for i in range(1, n_fold+1):
             x_train, y_train, x_val, y_val = train_test_split_cv(x, y, i, n_fold=n_fold)
             
-            model = create_model(kernel_size = ks, n_filter = nf, dropout = dropout)
+            model = create_model(kernel_size = ks, n_filter = nf, dropout = dropout, activation = act)
 
             model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, verbose=0)
             
@@ -158,8 +160,16 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
             step_tot+=1
             y_pred = to_category(model.predict(x_val, batch_size = batch_size))
 
+            scr = 0. 
+
             for key in functions.keys():
-                scores[key].append(score_(y_val, y_pred, functions.get(key))[1])
+                if(key == 'accuracy'):
+                    scr = model.evaluate(x_val, y_val, verbose=0)
+                    scr = scr[1]
+                else: 
+                    r_, scr = score_(y_val, y_pred, functions.get(key)) if not(key == 'f1') else score_(y_val, y_pred, functions.get(key), PN_only=True) 
+                
+                scores[key].append(scr)
                     
             if i == 1:
                 print("\n")
@@ -185,7 +195,7 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
     
     return scores
 
-def create_model(kernel_size = (2, 3, 4), n_filter = (100, 100, 100), dropout = 0.):
+def create_model(kernel_size = (2, 3, 4), n_filter = (100, 100, 100), dropout = 0., activation = 'relu'):
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     tweet_encoder = Embedding(embedding_matrix.shape[0], embedding_matrix.shape[1], weights=[embedding_matrix], 
                               input_length=MAX_SEQUENCE_LENGTH, trainable=True)(tweet_input)
@@ -193,7 +203,7 @@ def create_model(kernel_size = (2, 3, 4), n_filter = (100, 100, 100), dropout = 
     conv_branches = []
 
     for k in range(len(kernel_size)):
-        conv_branches.append(Conv1D(filters=n_filter[k], kernel_size=kernel_size[k], padding='valid', activation='relu', strides=1)(tweet_encoder))
+        conv_branches.append(Conv1D(filters=n_filter[k], kernel_size=kernel_size[k], padding='valid', activation=activation, strides=1)(tweet_encoder))
         conv_branches[k] = GlobalMaxPooling1D()(conv_branches[k])
 
     merged = concatenate(conv_branches, axis=1) if len(conv_branches) > 1 else conv_branches[0]
@@ -220,6 +230,7 @@ def switch_param(argument, val):
     elif argument =='x': return dict({'embedding':val})
     elif argument =='d': return dict({'dropout':float(val)})
     elif argument =='r': return dict({'regularization':float(val)})
+    elif argument =='a': return dict({'activation':val})
     else:
         print("Invalid parameter "+argument)
         return
@@ -231,6 +242,7 @@ def get_param():
             "n_filter" : n_filter,
             "kernel_size" : ker_size,
             "dropout" : 0.,
+            "activation" : 'relu',
             "embedding" : "TW200"
         })
 
@@ -253,13 +265,14 @@ epochs = params.get('epochs')
 kernel_size = params.get('kernel_size')
 n_filter = params.get('n_filter')
 dropout = params.get('dropout')
+activation = params.get('activation')
 embedding = params.get('embedding')
 
 if len(kernel_size) != len(n_filter):
     print("kernel_size(k) and n_filter(n) must match in tuple size | k="+str(len(kernel_size))+" n="+str(len(n_filter)))
     quit(-1)
 
-model_tag = "b"+str(batch_size)+"-e"+str(epochs)+"-n"+str(n_filter)+"-k"+str(kernel_size)+"-x"+str(embedding)
+model_tag = "b"+str(batch_size)+"-e"+str(epochs)+"-n"+str(n_filter)+"-k"+str(kernel_size)+"-x"+str(embedding)+"-a"+str(activation)
 
 print("\n["+str(time.asctime())+"] Started a "+str(N_FOLD)+"-fold cv with "+model_tag)
 print("\n==================================================================================================\n")

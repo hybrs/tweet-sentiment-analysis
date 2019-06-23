@@ -10,9 +10,9 @@ def print_sorted(scores, score):
 		print(item[0]+"\t"+str(item[1][0])[:5]+" +/-"+str(item[1][1])[:5])
 		print("--------------------------------------------------------------------------")
 
+		
 def print_sortedTab(scores, score):
-    x="&nbsp;"
-    print("| "+x+"|  <b>"+score+"</b>  |")
+    print("| &nbsp;|  <b>"+score+"</b>  |")
     print("|:--------:|:--------------:|")
     for item in sorted(scores[score].items(), key = operator.itemgetter(1), reverse=True):
         model = item[0]

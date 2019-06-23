@@ -4,13 +4,13 @@ import os
 import gc
 import sys
 import numpy as np
+import tensorflow as tf
 from keras.utils import to_categorical
 from keras.metrics import categorical_accuracy
 from keras.layers import Dense, Input, GlobalMaxPooling1D, Dropout
 from keras.layers import Conv1D, Conv2D, MaxPooling1D, Embedding, Flatten, concatenate, Activation
 from keras.models import Model, Sequential
 from sklearn.metrics import recall_score
-import preprocessor as p
 import operator
 import pickle
 import time
@@ -267,6 +267,12 @@ n_filter = params.get('n_filter')
 dropout = params.get('dropout')
 activation = params.get('activation')
 embedding = params.get('embedding')
+
+print("Setting GPU limitations...")
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.Session(config=config)
+print("GPU limitations setted")
 
 if len(kernel_size) != len(n_filter):
     print("kernel_size(k) and n_filter(n) must match in tuple size | k="+str(len(kernel_size))+" n="+str(len(n_filter)))

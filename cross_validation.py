@@ -1,4 +1,3 @@
-import numpy as np
 from collections import defaultdict
 import os
 import gc
@@ -18,7 +17,7 @@ from sklearn.metrics import f1_score, accuracy_score
 
 MAX_SEQUENCE_LENGTH = 40
 MAX_NUM_WORDS = 40000
-N_FOLD = 5
+N_FOLD = 10
 N_REPEAT = 3
 
 train_data = pickle.load(open("data/train_data", "rb"))
@@ -272,7 +271,7 @@ print("Setting GPU limitations...")
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 sess = tf.Session(config=config)
-print("GPU limitations setted")
+print("GPU limitations set")
 
 if len(kernel_size) != len(n_filter):
     print("kernel_size(k) and n_filter(n) must match in tuple size | k="+str(len(kernel_size))+" n="+str(len(n_filter)))

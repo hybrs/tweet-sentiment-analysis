@@ -10,7 +10,18 @@ def print_sorted(scores, score):
 		print(item[0]+"\t"+str(item[1][0])[:5]+" +/-"+str(item[1][1])[:5])
 		print("--------------------------------------------------------------------------")
 
-
+def print_sortedTab(scores, score):
+    x="&nbsp;"
+    print("| "+x+"|  <b>"+score+"</b>  |")
+    print("|:--------:|:--------------:|")
+    for item in sorted(scores[score].items(), key = operator.itemgetter(1), reverse=True):
+        model = item[0]
+        avg = str(item[1][0])[:5]
+        dev = str(item[1][1])[:5]
+        print("| baseline | "+avg+" ± "+dev+" |")
+    print("\n\n")
+	
+		
 grid_ = [ pickle.load(open('./cv_result/cv_result_b32-e2-n('+str(i)+', '+str(i)+', '+str(i)+')-k(2, 3, 4)-xTW200', 'rb')) for i in [100, 150, 200, 250, 300, 350] ]
 
 scores_ =  dict({

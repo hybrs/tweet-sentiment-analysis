@@ -4,6 +4,7 @@ import gc
 import sys
 import numpy as np
 import tensorflow as tf
+import keras
 from keras.utils import to_categorical
 from keras.metrics import categorical_accuracy
 from keras.layers import Dense, Input, GlobalMaxPooling1D, Dropout
@@ -270,7 +271,8 @@ embedding = params.get('embedding')
 print("Setting GPU limitations...")
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
-sess = tf.Session(config=config)
+session = tf.Session(config=config)
+keras.backend.tensorflow_backend.set_session(session)
 print("GPU limitations set")
 
 if len(kernel_size) != len(n_filter):

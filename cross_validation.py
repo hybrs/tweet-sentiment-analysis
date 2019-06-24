@@ -135,7 +135,7 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
     step_std = []
 
     functions=dict({
-        #'accuracy' : accuracy_score,
+        'accuracy' : accuracy_score,
         'f1' : f1_score,
         'mavg_recall': recall_score
         })

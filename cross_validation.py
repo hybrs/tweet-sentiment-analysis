@@ -18,7 +18,7 @@ from sklearn.metrics import f1_score, accuracy_score
 
 MAX_SEQUENCE_LENGTH = 40
 N_FOLD = 5
-N_REPEAT = 4
+N_REPEAT = 3
 
 train_data = pickle.load(open("data/train_data", "rb"))
 train_labels = pickle.load(open("data/train_labels", "rb"))

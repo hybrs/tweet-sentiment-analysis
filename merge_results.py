@@ -11,14 +11,29 @@ def print_sorted(scores, score):
 		print("--------------------------------------------------------------------------")
 
 		
-def print_sortedTab(scores, score):
-    print("| &nbsp;|  <b>"+score+"</b>  |")
+def print_sortedTabMrk(scores, score):
+    print("| <b>model </b>|  <b>"+score+"</b>  |")
     print("|:--------:|:--------------:|")
     for item in sorted(scores[score].items(), key = operator.itemgetter(1), reverse=True):
         model = item[0]
         avg = str(item[1][0])[:5]
         dev = str(item[1][1])[:5]
-        print("| baseline | "+avg+" ± "+dev+" |")
+        print("| "+model+" | "+avg+" ±"+dev+" |")
+    print("\n\n")
+
+
+def print_sortedTabLtx(scores, score):
+    print("\\begin{table}[]")
+    print("\\begin{tabular}{|c|c|}")
+    print("\\hline")
+    print(" \\textbf{model}  & \\textbf{"+score+"} \\\\ \\hline")
+    for item in sorted(scores[score].items(), key = operator.itemgetter(1), reverse=True):
+        model = item[0]
+        avg = str(item[1][0])[:5]
+        dev = str(item[1][1])[:5]
+        print("\\textit{"+model+"} & "+avg+" $\pm$"+dev+"\\\\ \\hline")
+    print("\\end{tabular}")
+    print("\\end{table}")
     print("\n\n")
 	
 		

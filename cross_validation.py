@@ -18,7 +18,7 @@ from sklearn.metrics import f1_score, accuracy_score
 
 MAX_SEQUENCE_LENGTH = 40
 MAX_NUM_WORDS = 40000
-N_FOLD = 10
+N_FOLD = 5
 N_REPEAT = 3
 
 train_data = pickle.load(open("data/train_data", "rb"))
@@ -136,7 +136,7 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
     step_std = []
 
     functions=dict({
-        'accuracy' : accuracy_score,
+        #'accuracy' : accuracy_score,
         'f1' : f1_score,
         'mavg_recall': recall_score
         })
@@ -279,7 +279,7 @@ if len(kernel_size) != len(n_filter):
     print("kernel_size(k) and n_filter(n) must match in tuple size | k="+str(len(kernel_size))+" n="+str(len(n_filter)))
     quit(-1)
 
-model_tag = "b"+str(batch_size)+"-e"+str(epochs)+"-n"+str(n_filter)+"-k"+str(kernel_size)+"-x"+str(embedding)+"-a"+str(activation)
+model_tag = "b"+str(batch_size)+"-e"+str(epochs)+"-n"+str(n_filter)+"-k"+str(kernel_size)+"-x"+str(embedding)+"-d"+str(dropout)+"-a"+str(activation)
 
 print("\n["+str(time.asctime())+"] Started a "+str(N_FOLD)+"-fold cv with "+model_tag)
 print("\n==================================================================================================\n")

@@ -58,10 +58,6 @@ def to_category(y_test_pred):
     return y_test_mod
 
 def train_test_split_cv(x, y, n_iter, n_fold = 10):
-    """
-    ...
-    """
-   
     x=list(x)
     y=list(y)
     n_iter = n_fold if n_iter > n_fold else n_iter 
@@ -326,4 +322,4 @@ elif mode == 'test':
         print("Class F1",gar)    
 
         results[t]=({'accuracy':accuracy, 'mavg_recall':mavg, 'f1':f1})
-        pickle.dump(file=open('../resultsCNN/'+mode+'_result_'+model_tag, 'wb'), obj=results)
+        pickle.dump(file=open('../cv_result/'+mode+'_result_'+model_tag, 'wb'), obj=results)

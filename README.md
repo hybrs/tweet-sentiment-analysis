@@ -9,12 +9,12 @@ All our experiments were run on a linux server with an nVIDIA Tesla K40 accelera
 
 The root of the project contains:
 
-	-  the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec:scripts) and [**Invocation**](#sec:invocation) for further details. 
-	- the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
-	- the Jupyter Notebook `Data_Cleaning.ipynb`, 
-	- altri script?
-	- the folder `cv_result`, output folder for our scripts in cv mode.
-	- the folder `results_test`, output folder for our script in test mode.
+ - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec:scripts) and [**Invocation**](#sec:invocation) for further details. 
+ - the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
+ - the Jupyter Notebook `Data_Cleaning.ipynb`, 
+ - altri script?
+ - the folder `cv_result`, output folder for our scripts in cv mode.
+ - the folder `results_test`, output folder for our script in test mode.
 
 ### Requirements 
 Code is written in Python (3.6.8) and requires Keras (2.2.4), Tensorflow (1.13.1) and [tweet-preprocessor](https://pypi.org/project/tweet-preprocessor/) (1.3.1).

@@ -1,18 +1,18 @@
 ## Sentiment Analysis on Tweets:
-### Message Polarity Classification | NLP Master Course @ UniPi
+### Message Polarity Classification | NLT Master Course @ UniPi
 #### Amendola M., Cornacchia G. and Salinas M.L.
 <hr>
 
 In repository there is all the code used to run the experiments in our [project report](link/al/report). We tackle the message polarity classification task, that is given a message decide whether it expresses negative, neutral or positive sentiment. We developed and validated the CNN from [Zhang and Wallace, 2015](https://arxiv.org/pdf/1510.03820.pdf) and compared the performance of this system with a new method of pre-training language representations, called [BERT](https://github.com/google-research/bert), which obtains state-of-the-art results on a wide array of NLP tasks. We performed 3 repetition of 5-fold-cv for each experiment.
 
-All our experiments were run on a linux server with an nVIDIA Tesla K40 accelerated GPU, that kindly provided to us by Professor Giuseppe Attardi @ UniPi.
+All our experiments were run on a linux server with an nVIDIA Tesla K40 accelerated GPU, kindly provided to us by Professor Giuseppe Attardi @ UniPi.
 
 The root of the project contains:
 
  - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec_scripts) and [**Invocation**](#sec_invocation) for further details. 
  - the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
  - the Jupyter Notebook `Data_Cleaning.ipynb`, contains the data pre-processing pipeline and the functions to export data, labels and the embedding matrix needed in the lookup layer of CNN the model. (*the code in this notebook has to be executed BEFORE the python scripts*)
- - altri script?
+ - the python script `run_classifier_.py`, adapted version of the orginal script in the BERT repo.
  - the folder `cv_result`, output folder for our scripts in cv mode.
  - the folder `results_test`, output folder for our script in test mode.
  - this README

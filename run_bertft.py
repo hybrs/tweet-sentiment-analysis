@@ -320,11 +320,11 @@ if len(sys.argv) > 1:
         for ar in sys.argv[1:]:
             value=ar.split('=')
             if value[0]=='train' : train_path=value[1]
-            elif value[0]=='batch_size' : TRAIN_BATCH_SIZE=int(value[1])
-            elif value[0]=='epochs' : NUM_TRAIN_EPOCHS=int(value[1])
-            elif value[0]=='seq_len' : MAX_SEQ_LENGTH=int(value[1])
-            elif value[0]=='reps' : REPS=int(value[1])
-            elif value[0]=='fold' : N_FOLD=int(value[1])
+            elif value[0]=='batch_size' : TRAIN_BATCH_SIZE=np.abs(int(value[1]))
+            elif value[0]=='epochs' : NUM_TRAIN_EPOCHS=np.abs(int(value[1]))
+            elif value[0]=='seq_len' : MAX_SEQ_LENGTH=np.abs(int(value[1]))
+            elif value[0]=='reps' : REPS=np.abs(int(value[1]))
+            elif value[0]=='fold' : N_FOLD=np.abs(int(value[1]))
             elif value[0]=='softmax' : SOFTMAX=int(value[1])
             elif value[0]=='mode' : MODE=value[1]
             elif value[0]=='test' : path_test=value[1]

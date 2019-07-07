@@ -29,18 +29,73 @@ For validating and assessing the risk of CNN we use `run_cnn.py`, while for BERT
 
 #### Script for CNN
 
+Once you've created your `train_data`, `train_labels` and `embedding_matrix*` files using the data pre-proc pipeline in `Data_Cleaning.ipynb`, and put them in the `data` folder, you can run the script in this way:
+
+```
+udage: python run_cnn.py [mMODE] [bBATCH_SIZE] [eEPOCHS] [kKERNEL_SIZE(S)] [nN_FILTER(S)]
+                            [aACTIVATION] [dDROPOUT] [xEMBEDDING_SUFF]
+                            
+
+example python run_cnn.py mtest k5,5 n100,100 mtest
+```
+the following table provides additional information on the parameters.
+
+Example of output of the script in test mode: verbose mode is on during train and we print scores, for both train and test set, for the single classes(*negative, neutral, positive*) and averaged.
+
+```
+Epoch 1/2
+21240/21240 [==============================] - 140s 7ms/step - loss: 0.8765 - categorical_accuracy: 0.5734
+Epoch 2/2
+21240/21240 [==============================] - 154s 7ms/step - loss: 0.5440 - categorical_accuracy: 0.7769
+Scores on training
+21240/21240 [==============================] - 16s 765us/step
+Accuracy:  0.953436911465309
+Mavg_recall:  0.9510301922854709
+F1-score:  0.9475169784506192
+Class F1 [0.9316843345111896, 0.9516968325791855, 0.9633496223900488]
+Start TEST
+**************************
+TEST:  2013
+3547/3547 [==============================] - 2s 678us/step
+Accuracy:  0.41217930642255163
+Mavg_recall:  0.34760255236915666
+F1-score:  0.2617124634916851
+Class F1 [0.13157894736842107, 0.4998584772148316, 0.39184597961494905]
+```
+
 #### Script for BERT
 
 To execute the script you must:
 * download Bert repository and BERT-Base Uncased from [google-research](https://github.com/google-research/bert);
 * put module `run_bertft.py` and `run_classifier_.py` into Bert directory. The latter is a modified version forked 
+ 
+All dataset (train and test) must be .tsv dataset where the last column is the tweet column and the penultimate column is the label column, as in the below example.
 
-Example of script esecution: 
+| ID  | Label   | Tweet   |
+|:--: |:--------: |:---------------------:  |
+| 32  | Positive  | It's a beautiful day!   |
+
+
+Example of script execution: 
 
 ```
 python run_bertft.py mode=test seq_len=50 epochs=3 reps=2 fold=10
 ```
 
+The script has some parameter with default value. The table below contains all the parameters you can change.
+
+|  <center>  Name   </center>   | <center>  Values   </center>  |                                                      <center>   Description </center>                                                       |    <center>    Default value    </center>       |
+|:----------: |:----------: |:------------------------------------------------------------------------------------------------------------------------: |:---------------------------:  |
+|   <center> mode   </center>   |<center>train<br>test </center>  | <center>if train: the script runs cross_validation <br>  else: the script runs the tests                                      |       <center>     train </center>              |
+|   <center> train   </center>  | <center>   path  </center>    | <center>path of the train dataset </center>                                                                                                 |  <center>  ./data/BERT_data/train/tweet_train_df.tsv   </center>    |
+|  <center>  test   </center>   |   <center> path  </center>    | <center>path of the directory that contains test datasets  </center>                                                                        |        <center>    ./data/BERT_data/test   </center>          |
+|  <center> softmax  </center>  |<center>0<br>1   </center>   | <center>if 1: the script runs BERT fine-tuning with softmax layer <br> else: the script run BERT fine-tuning with CNN </center>   |          <center>    1    </center>           |
+|<center> batch_size </center>  | <center>  int > 0  </center>  | <center>batch size   </center>                                                                                                              |            <center>  32    </center>          |
+|  <center> seq_len </center>   | <center>  int > 0   </center>| <center>sequence length</center>                                                                                                             |             <center> 40  </center>            |
+|  <center> epochs  </center>   | <center>  int > 0  </center>  | <center>number of epochs  </center>                                                                                                         |           <center>   2   </center>            |
+|  <center>  reps   </center>   | <center>  int > 0  </center>  | <center>number of repetition of cross-validation   </center>                                                                                |          <center>    3  </center>             |
+|   <center> fold   </center>   | <center>  int > 0  </center>  | <center>number of fold for cross-validation </center>                                                                                       |          <center>    5   </center>            |
+|  <center> print  </center>  |<center>0<br>1   </center>   | <center>if 1: at each step prints the recall and f1 scores for each class  </center>  |          <center>    0    </center> |
 
 Example of output of our script in cv mode: for each fold we print validation scores and scores for each class.
 
@@ -63,77 +118,7 @@ Recall:  0.6884577812392527
 F1:  0.6911314647836555
 ```
 
-
-
-#### Dataset 
-All dataset (train and test) must be .tsv dataset where the last column is the tweet column and the penultimate column is the label column, as in the below example.
-
-| ID  | Label   | Tweet   |
-|:--: |:--------: |:---------------------:  |
-| 32  | Positive  | It's a beautiful day!   |
-
-#### Parameters
-The script has some parameter with default value. 
-The table below contains all the parameters you can change.
-
-|  <center>  Name   </center>   | <center>  Values   </center>  |                                                      <center>   Description </center>                                                       |    <center>    Default value    </center>       |
-|:----------: |:----------: |:------------------------------------------------------------------------------------------------------------------------: |:---------------------------:  |
-|   <center> mode   </center>   |<center>train<br>test </center>  | <center>if train: the script runs cross_validation <br>  else: the script runs the tests                                      |       <center>     train </center>              |
-|   <center> train   </center>  | <center>   path  </center>    | <center>path of the train dataset </center>                                                                                                 |  <center>  ./data/BERT_data/train/tweet_train_df.tsv   </center>    |
-|  <center>  test   </center>   |   <center> path  </center>    | <center>path of the directory that contains test datasets  </center>                                                                        |        <center>    ./data/BERT_data/test   </center>          |
-|  <center> softmax  </center>  |<center>0<br>1   </center>   | <center>if 1: the script runs BERT fine-tuning with softmax layer <br> else: the script run BERT fine-tuning with CNN </center>   |          <center>    1    </center>           |
-|<center> batch_size </center>  | <center>  int > 0  </center>  | <center>batch size   </center>                                                                                                              |            <center>  32    </center>          |
-|  <center> seq_len </center>   | <center>  int > 0   </center>| <center>sequence length</center>                                                                                                             |             <center> 40  </center>            |
-|  <center> epochs  </center>   | <center>  int > 0  </center>  | <center>number of epochs  </center>                                                                                                         |           <center>   2   </center>            |
-|  <center>  reps   </center>   | <center>  int > 0  </center>  | <center>number of repetition of cross-validation   </center>                                                                                |          <center>    3  </center>             |
-|   <center> fold   </center>   | <center>  int > 0  </center>  | <center>number of fold for cross-validation </center>                                                                                       |          <center>    5   </center>            |
-|  <center> print  </center>  |<center>0<br>1   </center>   | <center>if 1: at each step prints the recall and f1 scores for each class  </center>  |          <center>    0    </center> |
-
-
-
-
-<a id="sec_invocation"></a>
-### Invocation
-```
-usage: run_[SCRIPT_SUFF].py [-mode] [-bBATCH_SIZE] [-eEPOCHS] [-kKERNEL_SIZE(S)] [-nN_FILTER(S)]
-                            [-aACTIVATION] [-dDROPOUT] [-xEMBEDDING_SUFF]
-                            model input
-
-CNN sentence/tweet classifier.
-
-positional arguments:
-  model                 model file (default mr)
-  input                 train/test file in SemEval twitter format
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -train                train model
-  -lower                whether to lowercase text
-  -filters FILTERS      n[,n]* (default 3,4,5)
-  -vectors VECTORS      word2vec embeddings file (random values if missing)
-  -dropout DROPOUT      dropout probability (default 0.5)
-
-.......
-
-
-```
-
-VECTORS is the word2vec binary file (e.g. `GoogleNews-vectors-negative300.bin` file),
-clean, if present, text is lower-cased.
-
-input contain sentences from the corpus in SemEval format, i.e. one sentence
-per line, tab separated values:
-
-```
-ID	UID	text	label
-```
-
-Also a sentence classifier is present, that does cross validation on the training set for evaluating the performance of the classifier, like in the original code:
-```
-	other code
-```
-
-### Hyperparameters
+### CNN Hyperparameters
 Ye Zhang has written a [very nice paper](http://arxiv.org/abs/1510.03820) doing an extensive analysis of model variants (e.g. filter widths, k-max pooling, word2vec vs Glove, etc.) and their effect on performance.
 
 ### SemEval-2017 SubTask 4A: Sentiment Analysis in Twitter

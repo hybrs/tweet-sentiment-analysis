@@ -32,8 +32,12 @@ ker_size = (2, 3, 4)
 
 def score_(y_true, y_pred, scorer, PN_only=False):
     """
-    Compute recall for each class and average the result (see SemEval2017)
-    :return: macroaveraged_recall.
+    Function that computes a score between a two vectors of labels.
+    :param y_true: target labels
+    :param y_pred: prediction labels
+    :param scorer: scorer function (e.g. one in sklearn.metrics)  
+    :return: class_scores, a list with the computed score for each class 
+            (negative, neutral, positive) and avg_ret the average of the score among the classes.
     """
     n_class = len(y_true[0])
     true_vects = [[] for i in range(n_class)]
@@ -44,11 +48,16 @@ def score_(y_true, y_pred, scorer, PN_only=False):
             true_vects[j].append(y_true[i][j])
             pred_vects[j].append(y_pred[i][j])
     
-    recalls = [ scorer(true_vects[i], pred_vects[i]) for i in [0,1,2]]
-    avg_ret = np.average(recalls) if not PN_only else np.average([recalls[0], recalls[2]])
-    return recalls, avg_ret
+    class_scores = [ scorer(true_vects[i], pred_vects[i]) for i in [0,1,2]]
+    avg_ret = np.average(class_scores) if not PN_only else np.average([class_scores[0], class_scores[2]])
+    return class_scores, avg_ret
 
 def to_category(y_test_pred):
+    """
+    Function that outputs one-hot representation of a list of integers (multiclass classification labels).
+    :param y_test_pred: label list to be converted  
+    :return: one-hot representation of the input
+    """
     y_test_mod = []
     for i in range(len(y_test_pred)):
         tmp = y_test_pred[i]
@@ -57,7 +66,15 @@ def to_category(y_test_pred):
     y_test_mod = np.array(y_test_mod)
     return y_test_mod
 
-def train_test_split_cv(x, y, n_iter, n_fold = 10):
+def train_test_split_cv(x, y, n_iter, n_fold = 5):
+    """
+    Split data and labels for a specific cross validaton fold.
+    :param x: input data
+    :param y: input labels
+    :param n_iter: fold for which we want the split (we used fixed folds across our experiments) 
+    :param n_fold: total number of folds 
+    :return: data and labels for train and validation of fold number n_iter of n_fold
+    """   
     x=list(x)
     y=list(y)
     n_iter = n_fold if n_iter > n_fold else n_iter 
@@ -66,7 +83,6 @@ def train_test_split_cv(x, y, n_iter, n_fold = 10):
     test_start_idx = (n_iter-1)*ns_fold
     test_end_idx = (n_iter)*ns_fold
     
-    #print("Test starts at "+str(test_start_idx)+" ending at "+str(test_end_idx))
     x_train, y_train = [], []
     
     if test_start_idx == 0:
@@ -86,7 +102,15 @@ def train_test_split_cv(x, y, n_iter, n_fold = 10):
     return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
 
 def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
-    #macro_averaged_recall, categorical accuracy on validation
+    """
+    Perform n_repeat of n_fold Cross Validation given train data and labels and a parameter dictionary.
+    :param x: train data 
+    :param y: train labels
+    :param n_fold: number of folds
+    :param n_repeat: number of times the n_fold-cv will be executed  
+    :param params: dictionary of parameters like the one defined in get_params()
+    :return: a dictionary containing the collected scores for the cross validation.
+    """
     results = []
     batch_size = params.get('batch_size')
     epochs = params.get('epochs')
@@ -142,8 +166,6 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
             print("["+str(time.asctime())+"] Step #"+str(it+1)+"."+str(i)+" ("+str(step_tot)+"/"+str(n_repeat*n_fold)+") mavg_recall on validation = "+str(scores['mavg_recall'][-1])[:5] + " accuracy on validation = "+str(scores['accuracy'][-1])[:5] + " f1 on validation = "+str(scores['f1'][-1])[:5])#+" - ca = "+str(ca))
             print("---------------------------------------------------------------------------------")
             
-            #fold_res[it].append(mavg)
-            
             del model
             del y_pred
             del x_train
@@ -153,15 +175,12 @@ def cross_validation(x, y, n_fold = 3, n_repeat = 1, **params):
             
             gc.collect()
 
-        #step_avg.append(np.average(fold_res[it]))
-        #step_std.append(np.std(fold_res[it])) 
-                        
-        #print("\n--------------------------------> Average mavg_recall at step #"+str(it+1)+" = "+str(step_avg[it])[:5]+" +/-"+str(step_std[it])[:5]+"<-------------------------------")
-        #results.append(step_avg[it])
-    
     return scores
 
 def create_model(kernel_size = (2, 3, 4), n_filter = (100, 100, 100), dropout = 0., activation = 'relu'):
+    """
+    Compiles and return a CNN for text classification based on [Zhang and Wallace, 2015].
+    """
     tweet_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     tweet_encoder = Embedding(embedding_matrix.shape[0], embedding_matrix.shape[1], weights=[embedding_matrix], 
                               input_length=MAX_SEQUENCE_LENGTH, trainable=True)(tweet_input)
@@ -220,7 +239,7 @@ def get_param():
             param = switch_param(ar[0], ar[1:])
             print(param)
             params.update(param)
-        
+    #Here we load the PRE-COMPUTED embedding matrix for the lookup layer of the CNN
     embedding_matrix = pickle.load(open(emb_path+params.get('embedding'), "rb"))   
     
     return params, embedding_matrix
@@ -266,6 +285,7 @@ if mode != 'cv' and mode!='test':
     quit(-1)
 model_tag = "b"+str(batch_size)+"-e"+str(epochs)+"-n"+str(n_filter)+"-k"+str(kernel_size)+"-x"+str(embedding)+"-d"+str(dropout)+"-a"+str(activation)
 
+#Cross Validation mode
 if mode == 'cv':
     print("cross_validation mode")
     res = cross_validation(train_data, train_labels, n_fold = N_FOLD, n_repeat = N_REPEAT, **params)
@@ -277,8 +297,7 @@ if mode == 'cv':
 
     cv_result = dict({model_tag:res})
     #pickle.dump(file=open('resultsCNN/'+mode+'_result_'+model_tag, 'wb'), obj=cv_result)
-
-
+#Test mode
 elif mode == 'test':
     print("test mode")
     print("Start training")

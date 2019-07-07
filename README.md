@@ -9,7 +9,7 @@ All our experiments were run on a linux server with an nVIDIA Tesla K40 accelera
 
 The root of the project contains:
 
- - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec_scripts)for further details. 
+ - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec_scripts) for further details. 
  - the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
  - the Jupyter Notebook `Data_Cleaning.ipynb`, contains the data pre-processing pipeline and the functions to export data, labels and the embedding matrix needed in the lookup layer of CNN the model. (*the code in this notebook has to be executed BEFORE the python scripts*)
  - the python script `run_classifier_.py`, adapted version of the orginal script in the BERT repo.

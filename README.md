@@ -32,7 +32,7 @@ For validating and assessing the risk of CNN we use `run_cnn.py`, while for BERT
 Once you've created your `train_data`, `train_labels` and `embedding_matrix*` files using the data pre-proc pipeline in `Data_Cleaning.ipynb`, and put them in the `data` folder, you can run the script in this way:
 
 ```
-python run_cnn.py mtest k5,5 n100,100 mtest
+python run_cnn.py mtest k5,5 n100,100
 ```
 the following table provides additional information on the parameters.
 

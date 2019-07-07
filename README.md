@@ -15,6 +15,7 @@ The root of the project contains:
  - altri script?
  - the folder `cv_result`, output folder for our scripts in cv mode.
  - the folder `results_test`, output folder for our script in test mode.
+ - this README
 
 ### Requirements 
 Code is written in Python (3.6.8) and requires Keras (2.2.4), Tensorflow (1.13.1) and [tweet-preprocessor](https://pypi.org/project/tweet-preprocessor/) (1.3.1).

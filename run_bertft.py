@@ -21,8 +21,13 @@ import run_classifier_ as run_classifier
 import tokenization
 
 from sklearn.metrics import confusion_matrix
-# Load all files from a directory in a DataFrame.
-def load_data(directory):
+
+def load_data(path):
+	"""
+    Load dataset from a file in a DataFrame.
+    :param path: path of file
+    :return: DataFrame
+    """
     
     lbl = {'negative':0,
            'neutral':1,
@@ -31,7 +36,7 @@ def load_data(directory):
     data = {}
     data["tweet"] = []
     data["label"] = []
-    with open(directory, "r", encoding='utf-8') as f:
+    with open(path, "r", encoding='utf-8') as f:
         for line in f:       
             fields = line.strip().split("\t")
             if (len(fields) > 2):
@@ -40,7 +45,12 @@ def load_data(directory):
     return pd.DataFrame.from_dict(data)
 
 def train_test_split_cv(inputs, n_iter):
-    
+    """
+    Splits dataset in train and test datasets according to actual number of iteration 
+    :param inputs: data to split
+    :param n_iter: number of iteration
+    :return: train and test
+    """
     n_iter = N_FOLD if n_iter > N_FOLD else n_iter
     ns_fold = int(len(inputs)/N_FOLD)
 
@@ -53,7 +63,13 @@ def train_test_split_cv(inputs, n_iter):
     return train, test
 
 def create_examples(lines, set_type, labels=None):
-#Generate data for the BERT model
+	"""
+    Generate data for the BERT model
+    :param lines: lists of tweets
+    :param set_type: 'train' if lines are train data, 'test' otherwise
+    :param labels: list of lines labels. Parameter for only 'train' set_type
+    :return: examples
+    """
     guid = f'{set_type}'
     examples = []
     if guid == 'train':
@@ -71,7 +87,10 @@ def create_examples(lines, set_type, labels=None):
     return examples
 
 def input_fn_builder(features, seq_length, is_training, drop_remainder):
-  """Creates an `input_fn` closure to be passed to TPUEstimator."""
+	"""
+    Creates an `input_fn` closure to be passed to TPUEstimator.
+    :return: examples
+    """
 
   all_input_ids = []
   all_input_mask = []
@@ -120,6 +139,11 @@ def input_fn_builder(features, seq_length, is_training, drop_remainder):
   return input_fn
 
 def train_estimator(train):
+	"""
+	Creates the estimator and train it with dataset in input
+	:param train: dataset
+	:return: trained estimator 
+	"""
     train_examples = create_examples(train['tweet'], 'train', labels=train['label'])
     
     print('TRAIN: ', len(train))
@@ -161,6 +185,12 @@ def train_estimator(train):
     return estimator
 
 def predict(test, estimator):
+	"""
+	Predicts test labels with estimator already trained
+	:param estimator: estimator already trained on train tweets
+	:param test: test dataset
+	:return: result
+	"""
     predict_examples = create_examples(test['tweet'], 'test')
 
     predict_features = run_classifier.convert_examples_to_features(
@@ -177,15 +207,17 @@ def predict(test, estimator):
     return result
 
 def print_result(test, result):
+	"""
+	Prints accuracy, macro averaged recall, f1 (averaged only on negative and positive class) scores
+	:param test: real labels of tweets test
+	:param result: labels predicted  by estimator
+	:return: accuracy, mavg_recall, f1
+	"""
     preds = []
     for prediction in result:
           preds.append(np.argmax(prediction['probabilities']))
 
-    '''cm = confusion_matrix(list(test['label']),preds)
-    #cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    accuracy_=cm.diagonal()/cm.sum(axis=1)#cm.diagonal()'''
     accuracy_=accuracy_score(list(test['label']),preds)            
-
     recall_=recall_score(list(test['label']),preds, average=None)
     f1_=f1_score(list(test['label']),preds,average=None)
 
@@ -207,6 +239,11 @@ def print_result(test, result):
     return (accuracy_avg,recall_avg, f1_avg)
 
 def cross_validation(train):
+	"""
+	Implements cross-validation MODE with parameters
+	:param train: train dataset
+	:return: final result, dictionary with scores 
+	"""
 
     accuracy_reps=[]
     recall_reps=[]
@@ -255,7 +292,11 @@ def cross_validation(train):
 
 
 def test_estimator(train, path_test):
-
+	""""
+	Implements the test MODE
+	:param train: train dataset
+	:param path_test: direcory path of all tests
+	"""
     estimator=train_estimator(train)
 
     final_result={}

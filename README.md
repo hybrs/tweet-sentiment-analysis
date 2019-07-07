@@ -96,13 +96,13 @@ The script has some parameter with default value. The table below contains all t
 |   <center> mode   </center>   |<center>train<br>test </center>  | <center>if train: the script runs cross_validation <br>  else: the script runs the tests                                      |       <center>     train </center>              |
 |   <center> train   </center>  | <center>   path  </center>    | <center>path of the train dataset </center>                                                                                                 |  <center>  ./data/BERT_data/train/tweet_train_df.tsv   </center>    |
 |  <center>  test   </center>   |   <center> path  </center>    | <center>path of the directory that contains test datasets  </center>                                                                        |        <center>    ./data/BERT_data/test   </center>          |
-|  <center> softmax  </center>  |<center>0<br>1   </center>   | <center>if 1: the script runs BERT fine-tuning with softmax layer <br> else: the script run BERT fine-tuning with CNN </center>   |          <center>    1    </center>           |
+|  <center> softmax  </center>  |<center>0<br>1   </center>   | <center>if 1 run BERT fine-tuning with softmax layer <br> else run BERT fine-tuning with CNN </center>   |          <center>    1    </center>           |
 |<center> batch_size </center>  | <center>  int > 0  </center>  | <center>batch size   </center>                                                                                                              |            <center>  32    </center>          |
 |  <center> seq_len </center>   | <center>  int > 0   </center>| <center>sequence length</center>                                                                                                             |             <center> 40  </center>            |
 |  <center> epochs  </center>   | <center>  int > 0  </center>  | <center>number of epochs  </center>                                                                                                         |           <center>   2   </center>            |
 |  <center>  reps   </center>   | <center>  int > 0  </center>  | <center>number of repetition of cross-validation   </center>                                                                                |          <center>    3  </center>             |
 |   <center> fold   </center>   | <center>  int > 0  </center>  | <center>number of fold for cross-validation </center>                                                                                       |          <center>    5   </center>            |
-|  <center> print  </center>  |<center>0<br>1   </center>   | <center>if 1: at each step prints the recall and f1 scores for each class  </center>  |          <center>    0    </center> |
+|  <center> print  </center>  |<center>0<br>1   </center>   | <center>if 1 prints the recall and f1 scores for each class  </center>  |          <center>    0    </center> |
 
 Example of output of our script in cv mode: for each fold we print validation scores and scores for each class.
 

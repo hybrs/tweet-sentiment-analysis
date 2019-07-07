@@ -9,7 +9,7 @@ All our experiments were run on a linux server with an nVIDIA Tesla K40 accelera
 
 The root of the project contains:
 
- - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec:scripts) and (**Invocation**)[#sec:invocation] for further details. 
+ - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec:scripts) and [**Invocation**](#sec_invocation) for further details. 
  - the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
  - the Jupyter Notebook `Data_Cleaning.ipynb`, contains the data pre-processing pipeline. (*the code in this notebook has to be executed BEFORE the python scripts*)
  - altri script?
@@ -26,7 +26,7 @@ Before running the scripts make sure that your data has been preprocessed as ill
 
 For the CNN `CNN/run_cnn.py` for BERT `BERT/run_bertft.py`
 
-<a id="sec:invocation"></a>
+<a id="sec_invocation"></a>
 ### Invocation
 ```
 usage: run_[SCRIPT_SUFF].py [-mode] [-bBATCH_SIZE] [-eEPOCHS] [-kKERNEL_SIZE(S)] [-nN_FILTER(S)]

@@ -15,15 +15,16 @@ import operator
 import pickle
 import time
 from sklearn.metrics import f1_score, accuracy_score
+from keras.models import model_from_json
 
 MAX_SEQUENCE_LENGTH = 40
 N_FOLD = 5
 N_REPEAT = 3
 
-train_data = pickle.load(open("data/train_data", "rb"))
-train_labels = pickle.load(open("data/train_labels", "rb"))
+train_data = pickle.load(open("data/CNN/train/train_data", "rb"))
+train_labels = pickle.load(open("data/CNN/train/train_labels", "rb"))
 
-emb_path = "data/embedding_matrix"
+emb_path = "data/CNN/embedding_matrix"
 batch_sz = 32
 ep = 2
 n_filter = (100, 100, 100)
@@ -44,38 +45,8 @@ def score_(y_true, y_pred, scorer, PN_only=False):
             pred_vects[j].append(y_pred[i][j])
     
     recalls = [ scorer(true_vects[i], pred_vects[i]) for i in [0,1,2]]
-    avg_ret = np.average(recalls) if not PN_only else np.average(np.array(recalls[0], recalls[2])) 
+    avg_ret = np.average(recalls) if not PN_only else np.average([recalls[0], recalls[2]])
     return recalls, avg_ret
-
-def get_test_data(test_sents, tokenizer, word_index):
-    test_text = []
-    test_labls = []
-
-    for s in test_sents:
-        test_text.append(s[0])
-        test_labls.append(s[1])
-
-    print('Found %s tweets.' % len(test_sents))
-
-    tokenizer.word_index = word_index
-    tokenizer.fit_on_texts(test_text)
-    tokenizer.word_index = word_index
-    test_sequences = tokenizer.texts_to_sequences(test_text)
-
-    #test_word_index = word_index
-    print('Found %s unique tokens.' % len(word_index))
-
-    test_data = pad_sequences(test_sequences, maxlen=MAX_SEQUENCE_LENGTH)
-
-    test_labels = to_categorical(np.asarray(test_labls))
-    
-    print('Shape of data tensor:', test_data.shape)
-    print('Shape of label tensor:', test_labels.shape)
-
-    x_test = test_data
-    y_test = test_labels
-    
-    return x_test, y_test
 
 def to_category(y_test_pred):
     y_test_mod = []
@@ -87,10 +58,6 @@ def to_category(y_test_pred):
     return y_test_mod
 
 def train_test_split_cv(x, y, n_iter, n_fold = 10):
-    """
-    ...
-    """
-   
     x=list(x)
     y=list(y)
     n_iter = n_fold if n_iter > n_fold else n_iter 
@@ -230,6 +197,7 @@ def switch_param(argument, val):
     elif argument =='d': return dict({'dropout':float(val)})
     elif argument =='r': return dict({'regularization':float(val)})
     elif argument =='a': return dict({'activation':val})
+    elif argument =='m': return dict({'mode':val})
     else:
         print("Invalid parameter "+argument)
         return
@@ -242,7 +210,8 @@ def get_param():
             "kernel_size" : ker_size,
             "dropout" : 0.,
             "activation" : 'relu',
-            "embedding" : "TW200"
+            "embedding" : "TW200",
+            "mode" : "cv"
         })
 
     if len(sys.argv) > 1:
@@ -266,6 +235,21 @@ n_filter = params.get('n_filter')
 dropout = params.get('dropout')
 activation = params.get('activation')
 embedding = params.get('embedding')
+mode = params.get('mode')
+
+functions=dict({
+    'accuracy' : accuracy_score,
+    'f1' : f1_score,
+    'mavg_recall': recall_score
+    })
+scores = dict({
+    'accuracy': [],
+    'f1': [],
+    'mavg_recall': []
+    })
+
+results = dict({})
+obj2save = []
 
 print("Setting GPU limitations...")
 config = tf.ConfigProto()
@@ -277,19 +261,65 @@ print("GPU limitations set")
 if len(kernel_size) != len(n_filter):
     print("kernel_size(k) and n_filter(n) must match in tuple size | k="+str(len(kernel_size))+" n="+str(len(n_filter)))
     quit(-1)
-
+if mode != 'cv' and mode!='test':
+    print("mode must be cv or test.")
+    quit(-1)
 model_tag = "b"+str(batch_size)+"-e"+str(epochs)+"-n"+str(n_filter)+"-k"+str(kernel_size)+"-x"+str(embedding)+"-d"+str(dropout)+"-a"+str(activation)
 
-print("\n["+str(time.asctime())+"] Started a "+str(N_FOLD)+"-fold cv with "+model_tag)
-print("\n==================================================================================================\n")
+if mode == 'cv':
+    print("cross_validation mode")
+    res = cross_validation(train_data, train_labels, n_fold = N_FOLD, n_repeat = N_REPEAT, **params)
+    print("\n=================================================================================================================\n")
+    print("["+str(time.asctime())+"] completed a "+str(N_FOLD)+"-fold cv with "+model_tag+
+        "\n mavg_recall on validation = "+str(np.average(res['mavg_recall']))[:5] + "+/-"+str(np.std(res['mavg_recall']))[:5] 
+        +" accuracy on validation = "+str(np.average(res['accuracy']))[:5] + "+/-"+str(np.std(res['accuracy']))[:5]+ 
+        " f1 on validation = "+str(np.average(res['f1']))[:5] + "+/-"+str(np.std(res['f1']))[:5])
 
-res = cross_validation(train_data, train_labels, n_fold = N_FOLD, n_repeat = N_REPEAT, **params)
-print("\n=================================================================================================================\n")
-print("["+str(time.asctime())+"] completed a "+str(N_FOLD)+"-fold cv with "+model_tag+
-    "\n mavg_recall on validation = "+str(np.average(res['mavg_recall']))[:5] + "+/-"+str(np.std(res['mavg_recall']))[:5] 
-    +" accuracy on validation = "+str(np.average(res['accuracy']))[:5] + "+/-"+str(np.std(res['accuracy']))[:5]+ 
-    " f1 on validation = "+str(np.average(res['f1']))[:5] + "+/-"+str(np.std(res['f1']))[:5])
+    cv_result = dict({model_tag:res})
+    pickle.dump(file=open('resultsCNN/'+mode+'_result_'+model_tag, 'wb'), obj=cv_result)
 
-cv_result = dict({model_tag:res})
 
-pickle.dump(file=open('cv_result/cv_result_'+model_tag, 'wb'), obj=cv_result)
+elif mode == 'test':
+    print("test mode")
+    print("Start training")
+    model = create_model(kernel_size = kernel_size, n_filter = n_filter, dropout = dropout, activation = activation)
+    model.fit(train_data, train_labels, batch_size=32, epochs=2, verbose=1)
+    print("Scores on training")
+    y_pred = to_category(model.predict(train_data, batch_size = batch_size))
+    gar, accuracy = model.evaluate(train_data, train_labels, verbose=1)
+
+    gar, mavg = score_(train_labels, y_pred, functions.get('mavg_recall'))
+
+    gar, f1 = score_(train_labels, y_pred, functions.get('f1'), PN_only=True) 
+
+    print("Accuracy: ",accuracy)
+    print("Mavg_recall: ",mavg)
+    print("F1-score: ",f1)
+    print("Class F1",gar)    
+
+
+    test_files = ['2013','2013sms','2014','2014livej','2014sar','2015','2016','2017']
+
+    print("Start TEST")
+        
+    for t in test_files:
+        print("****************************************************************************")
+        print("TEST: ",t)
+        x_test = pickle.load(open("data/CNN/test/test_data_"+t, "rb"))
+        y_test = pickle.load(open("data/CNN/test/test_labels_"+t, "rb"))
+
+        y_pred = to_category(model.predict(x_test, batch_size = batch_size))
+
+        gar, accuracy = model.evaluate(x_test, y_test, verbose=1)
+
+        gar, mavg = score_(y_test, y_pred, functions.get('mavg_recall'))
+
+        gar, f1 = score_(y_test, y_pred, functions.get('f1'), PN_only=True) 
+
+        print("Accuracy: ",accuracy)
+        print("Mavg_recall: ",mavg)
+        print("F1-score: ",f1)
+        print("Class F1",gar)    
+
+        results[t]=({'accuracy':accuracy, 'mavg_recall':mavg, 'f1':f1})
+        pickle.dump(file=open('cv_result/'+mode+'_result_'+model_tag, 'wb'), obj=results)

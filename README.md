@@ -3,29 +3,29 @@
 #### Amendola M., Cornacchia G. and Salinas M.L.
 <hr>
 
-Fork by Giuseppe Attardi from https://github.com/yoonkim/CNN_sentence.git.
-Differences with the original:
-- multiclass classification
-- model saving and loading for classifying files, e.g. tweets
-- configurable parameters
-- integrated program, without a separate preprocessing stage
-- input in a single file, annotated in the format used in the SemEval Twitter Sentiment Analysis tasks.
+In repository there is all the code used to run the experiments in our [project report](link/al/report). We tackle the message polarity classification task, that is given a message decide whether it expresses negative, neutral or positive sentiment. We developed and validated the CNN from [Zhang and Wallace, 2015](https://arxiv.org/pdf/1510.03820.pdf) and compared the performance of this system with a new method of pre-training language representations, called [BERT](https://github.com/google-research/bert), which obtains state-of-the-art results on a wide array of NLP tasks.
 
-The original code by Kim Yoon implements the technique described in the paper:
-[Convolutional Neural Networks for Sentence Classification](http://arxiv.org/abs/1408.5882) (EMNLP 2014).
-Please cite both this page and the original paper when using the program.
+All our experiments were run on a linux server with an nVIDIA Tesla K40 accelerated GPU, that kindly provided to us by Professor Giuseppe Attardi @ UniPi.
 
-### Requirements
-Code is written in Python (2.7) and requires Theano (0.7).
+The root of the project contains:
 
-Using the pre-trained `word2vec` vectors will also require downloading the binary file from
-https://code.google.com/p/word2vec/
+	-  the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec:scripts) and [**Invocation**](#sec:invocation) for further details. 
+	- the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
+	- the Jupyter Notebook `Data_Cleaning.ipynb`, 
+	- altri script?
+	- the folder `cv_result`, output folder for our scripts in cv mode.
+	- the folder `results_test`, output folder for our script in test mode.
+
+### Requirements 
+Code is written in Python (3.6.8) and requires Keras (2.2.4), Tensorflow (1.13.1) and [tweet-preprocessor](https://pypi.org/project/tweet-preprocessor/) (1.3.1).
+
+Before running the script
 
 ### Scripts
 
 For the CNN `CNN/run_cnn.py` for BERT `BERT/run_bertft.py`
 
-
+<a id="sec:invocation"></a>
 ### Invocation
 ```
 usage: run_[SCRIPT_SUFF].py [-mode] [-bBATCH_SIZE] [-eEPOCHS] [-kKERNEL_SIZE(S)] [-nN_FILTER(S)]

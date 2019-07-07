@@ -3,7 +3,7 @@
 #### Amendola M., Cornacchia G. and Salinas M.L.
 <hr>
 
-In repository there is all the code used to run the experiments in our [project report](link/al/report). We tackle the message polarity classification task, that is given a message decide whether it expresses negative, neutral or positive sentiment. We developed and validated the CNN from [Zhang and Wallace, 2015](https://arxiv.org/pdf/1510.03820.pdf) and compared the performance of this system with a new method of pre-training language representations, called [BERT](https://github.com/google-research/bert), which obtains state-of-the-art results on a wide array of NLP tasks. We performed 3 repetition of 5-fold-cv for each experiment.
+In repository there is all the code used to run the experiments in our [project report]([NLT-project_report]Sentiment_Analysis_on_Tweets.pdf). We tackle the message polarity classification task, that is given a message decide whether it expresses negative, neutral or positive sentiment. We developed and validated the CNN from [Zhang and Wallace, 2015](https://arxiv.org/pdf/1510.03820.pdf) and compared the performance of this system with a new method of pre-training language representations, called [BERT](https://github.com/google-research/bert), which obtains state-of-the-art results on a wide array of NLP tasks. We performed 3 repetition of 5-fold-cv for each experiment.
 
 All our experiments were run on a linux server with an nVIDIA Tesla K40 accelerated GPU, kindly provided to us by Professor Giuseppe Attardi @ UniPi.
 

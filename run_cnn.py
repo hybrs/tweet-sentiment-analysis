@@ -276,7 +276,7 @@ if mode == 'cv':
         " f1 on validation = "+str(np.average(res['f1']))[:5] + "+/-"+str(np.std(res['f1']))[:5])
 
     cv_result = dict({model_tag:res})
-    pickle.dump(file=open('resultsCNN/'+mode+'_result_'+model_tag, 'wb'), obj=cv_result)
+    #pickle.dump(file=open('resultsCNN/'+mode+'_result_'+model_tag, 'wb'), obj=cv_result)
 
 
 elif mode == 'test':
@@ -322,4 +322,4 @@ elif mode == 'test':
         print("Class F1",gar)    
 
         results[t]=({'accuracy':accuracy, 'mavg_recall':mavg, 'f1':f1})
-        pickle.dump(file=open('cv_result/'+mode+'_result_'+model_tag, 'wb'), obj=results)
+        #pickle.dump(file=open('cv_result/'+mode+'_result_'+model_tag, 'wb'), obj=results)

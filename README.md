@@ -32,13 +32,20 @@ For validating and assessing the risk of CNN we use `run_cnn.py`, while for BERT
 Once you've created your `train_data`, `train_labels` and `embedding_matrix*` files using the data pre-proc pipeline in `Data_Cleaning.ipynb`, and put them in the `data` folder, you can run the script in this way:
 
 ```
-udage: python run_cnn.py [mMODE] [bBATCH_SIZE] [eEPOCHS] [kKERNEL_SIZE(S)] [nN_FILTER(S)]
-                            [aACTIVATION] [dDROPOUT] [xEMBEDDING_SUFF]
-                            
-
-example python run_cnn.py mtest k5,5 n100,100 mtest
+python run_cnn.py mtest k5,5 n100,100 mtest
 ```
 the following table provides additional information on the parameters.
+
+| <center>Name  | <center>Values  |<center> Description   | <center>Default Value   |
+|:----: |:-------------:  |-------------------------------------------------------------------------------------  |------------------------------ |
+| <center>b</center>  | <center>int > 0</center>  | <center> batch size </center>   | <center> 32 </center>   |
+| <center>e </center> | <center>int > 0</center>  | <center> number of epochs </center>   | <center>2</center>  |
+| <center>k </center> | <center>tuple </center> | <center> seq of int comma separated that specifies kernels size </center>   | <center>2,3,4</center>  |
+| <center>n </center> | <center>tuple </center> | <center> seq of int comma separated that specifies filters size </center>   | <center>100,100,100</center>  |
+| <center>x </center> | <center>string</center>   | <center> suffix of the matrix build with the data cleaning pipeline </center>   | <center>TW200</center>  |
+| <center>a </center> | <center>string </center>  | <center> activation function </center>  | <center>relu</center>   |
+| <center>d</center>  | <center>float >= 0</center>   | <center> dropout </center>  | <center>0.0</center>  |
+| <center>m   </center>| <center>cv <br> test </center> | <center> if cv: script runs cross-validation <br> else: script runs tests</center>  | <center> cv </center>   |
 
 Example of output of the script in test mode: verbose mode is on during train and we print scores, for both train and test set, for the single classes(*negative, neutral, positive*) and averaged.
 
@@ -123,5 +130,5 @@ Ye Zhang has written a [very nice paper](http://arxiv.org/abs/1510.03820) doing 
 
 ### SemEval-2017 SubTask 4A: Sentiment Analysis in Twitter
 
-Experiment using test data from reruns of SemEval from 2013 up to 2017, running `run_bertft.py` option *parameters* achieves state of the art scores across multiple test sets. *(e.g as reported in [Rosenthal et al., 2017](http://alt.qcri.org/semeval2017/task4/data/uploads/semeval2017-task4.pdf) in 2017 the top f1-score was 0.00000000, our system achives 0.00000000)*.
+Experiment using test data from reruns of SemEval from 2013 up to 2017, running `run_bertft.py` option *mode = test* achieves state of the art scores across multiple test sets. *(e.g as reported in [Rosenthal et al., 2017](http://alt.qcri.org/semeval2017/task4/data/uploads/semeval2017-task4.pdf) in 2017 the top f1-score was 0.685, our system achives 0.694)*.
 

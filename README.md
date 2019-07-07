@@ -1,5 +1,5 @@
 ## Sentiment Analysis on Tweets:
-### Message Polarity Classification | NLT Master Course @ UniPi
+### Message Polarity Classification | HLT Master Course @ UniPi
 #### Amendola M., Cornacchia G. and Salinas M.L.
 <hr>
 

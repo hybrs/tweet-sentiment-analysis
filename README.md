@@ -11,7 +11,7 @@ The root of the project contains:
 
  - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec:scripts) and [**Invocation**](#sec:invocation) for further details. 
  - the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
- - the Jupyter Notebook `Data_Cleaning.ipynb`, 
+ - the Jupyter Notebook `Data_Cleaning.ipynb`, contains the data pre-processing pipeline. (*the code in this notebook has to be executed BEFORE the python scripts*)
  - altri script?
  - the folder `cv_result`, output folder for our scripts in cv mode.
  - the folder `results_test`, output folder for our script in test mode.
@@ -19,7 +19,7 @@ The root of the project contains:
 ### Requirements 
 Code is written in Python (3.6.8) and requires Keras (2.2.4), Tensorflow (1.13.1) and [tweet-preprocessor](https://pypi.org/project/tweet-preprocessor/) (1.3.1).
 
-Before running the script
+Before running the scripts make sure that your data has been preprocessed as illustrated in `Data_Cleaning.ipynb`.
 
 ### Scripts
 

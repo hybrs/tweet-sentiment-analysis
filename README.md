@@ -66,52 +66,10 @@ Also a sentence classifier is present, that does cross validation on the trainin
 	other code
 ```
 
-### Running the models (CPU)
-Example commands:
-
-```
-THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 ./conv_net_sentence.py -vectors w2v_file mr.w2v mr.tsv
-```
-
-This will run the CNN classifier using the embeddings from file w2v_file and
-the sentences in the TSV file mr.tsv and saving the model to file mr.w2v.
-
-### Using the GPU
-GPU will result in a good 10x to 20x speed-up, so it is highly recommended. 
-To use the GPU, simply change `device=cpu` to `device=gpu` (or whichever gpu you are using).
-For example:
-```
-THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python conv_net_sentence.py -nonstatic -word2vec
-```
-
-### Example output
-CPU output:
-```
-epoch: 1, training time: 219.72 secs, train perf: 81.79 %, val perf: 79.26 %
-epoch: 2, training time: 219.55 secs, train perf: 82.64 %, val perf: 76.84 %
-epoch: 3, training time: 219.54 secs, train perf: 92.06 %, val perf: 80.95 %
-```
-GPU output:
-```
-epoch: 1, training time: 16.49 secs, train perf: 81.80 %, val perf: 78.32 %
-epoch: 2, training time: 16.12 secs, train perf: 82.53 %, val perf: 76.74 %
-epoch: 3, training time: 16.16 secs, train perf: 91.87 %, val perf: 81.37 %
-```
-
-### Other Implementations
-#### TensorFlow
-[Denny Britz](http://www.wildml.com) has an implementation of the model in TensorFlow:
-
-https://github.com/dennybritz/cnn-text-classification-tf
-
-He also wrote a [nice tutorial](http://www.wildml.com/2015/12/implementing-a-cnn-for-text-classification-in-tensorflow) on it, as well as a general tutorial on [CNNs for NLP](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp).
-
 ### Hyperparameters
 Ye Zhang has written a [very nice paper](http://arxiv.org/abs/1510.03820) doing an extensive analysis of model variants (e.g. filter widths, k-max pooling, word2vec vs Glove, etc.) and their effect on performance.
 
-### SemEval-2015 Task 10: Sentiment Analysis in Twitter
+### SemEval-2017 SubTask 4A: Sentiment Analysis in Twitter
 
-Experiments using the data from SemEval-15, using option --filters 7,7,7, achieves an accuracy
-of 67.28%, better than the top official score (64.84%), as reported in:
-Sara Rosenthal et al. [SemEval-2015 Task 10: Sentiment Analysis in Twitter](http://alt.qcri.org/semeval2015/cdrom/pdf/SemEval078.pdf).
+Experiment using test data from reruns of SemEval from 2013 up to 2017, running `run_bertft.py` option *parameters* achieves state of the art scores across multiple test sets. *(e.g as reported in [Rosenthal et al., 2017](http://alt.qcri.org/semeval2017/task4/data/uploads/semeval2017-task4.pdf) in 2017 the top f1-score was 0.00000000, our system achives 0.00000000)*.
 

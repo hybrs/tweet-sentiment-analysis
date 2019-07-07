@@ -87,8 +87,8 @@ The table below contains all the parameters you can change.
 |  <center> epochs  </center>   | <center>  int > 0  </center>  | <center>number of epochs  </center>                                                                                                         |           <center>   2   </center>            |
 |  <center>  reps   </center>   | <center>  int > 0  </center>  | <center>number of repetition of cross-validation   </center>                                                                                |          <center>    3  </center>             |
 |   <center> fold   </center>   | <center>  int > 0  </center>  | <center>number of fold for cross-validation </center>                                                                                       |          <center>    5   </center>            |
-|  <center> print  </center>  |<center>0<br>1   </center>   | <center>if 1: at each step prints the recall and f1 scores for each class  </center>  |          <center>    0    </center> 
-    |
+|  <center> print  </center>  |<center>0<br>1   </center>   | <center>if 1: at each step prints the recall and f1 scores for each class  </center>  |          <center>    0    </center> |
+
 
 
 

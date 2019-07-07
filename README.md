@@ -9,18 +9,20 @@ All our experiments were run on a linux server with an nVIDIA Tesla K40 accelera
 
 The root of the project contains:
 
- - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec:scripts) and [**Invocation**](#sec:invocation) for further details. 
+ - the python script `run_cnn.py`, that implements the CNN and allow the user to choose between Cross-Validation and Test mode. See [**Scripts**](#sec_scripts) and [**Invocation**](#sec_invocation) for further details. 
  - the python script `run_bertft.py`, the same as `run_cnn.py` but implements both the fine-tuned BERT systems involved in our analysis. 
  - the Jupyter Notebook `Data_Cleaning.ipynb`, contains the data pre-processing pipeline and the functions to export data, labels and the embedding matrix needed in the lookup layer of CNN the model. (*the code in this notebook has to be executed BEFORE the python scripts*)
  - altri script?
  - the folder `cv_result`, output folder for our scripts in cv mode.
  - the folder `results_test`, output folder for our script in test mode.
+ - this README
 
 ### Requirements 
 Code is written in Python (3.6.8) and requires Keras (2.2.4), Tensorflow (1.13.1) and [tweet-preprocessor](https://pypi.org/project/tweet-preprocessor/) (1.3.1).
 
 Before running the scripts make sure that your data has been preprocessed as illustrated in `Data_Cleaning.ipynb`.
 
+<a id="sec_scripts"></a>
 ### Scripts
 
 For validating and assessing the risk of CNN we use `run_cnn.py`, while for BERT `run_bertft.py`.
@@ -90,7 +92,7 @@ The table below contains all the parameters you can change.
 
 
 
-<a id="sec:invocation"></a>
+<a id="sec_invocation"></a>
 ### Invocation
 ```
 usage: run_[SCRIPT_SUFF].py [-mode] [-bBATCH_SIZE] [-eEPOCHS] [-kKERNEL_SIZE(S)] [-nN_FILTER(S)]

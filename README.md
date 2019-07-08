@@ -74,7 +74,7 @@ Class F1 [0.13157894736842107, 0.4998584772148316, 0.39184597961494905]
 
 To execute the script you must:
 * download Bert repository and BERT-Base Uncased from [google-research](https://github.com/google-research/bert);
-* put module `run_bertft.py` and `run_classifier_.py` into Bert directory. The latter is a modified version forked 
+* put module `run_bertft.py` and `run_classifier_.py` into Bert directory. 
  
 All dataset (train and test) must be .tsv dataset where the last column is the tweet column and the penultimate column is the label column, as in the below example.
 

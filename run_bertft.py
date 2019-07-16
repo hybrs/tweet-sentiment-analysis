@@ -357,7 +357,7 @@ path_test='./data/BERT_data/test'
 if len(sys.argv) > 1:
         for ar in sys.argv[1:]:
             value=ar.split('=')
-            if value[0]=='train' : train_path=value[1]
+            if value[0]=='train' : path_train=value[1]
             elif value[0]=='batch_size' : TRAIN_BATCH_SIZE=np.abs(int(value[1]))
             elif value[0]=='epochs' : NUM_TRAIN_EPOCHS=np.abs(int(value[1]))
             elif value[0]=='seq_len' : MAX_SEQ_LENGTH=np.abs(int(value[1]))

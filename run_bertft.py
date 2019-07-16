@@ -23,12 +23,11 @@ import tokenization
 from sklearn.metrics import confusion_matrix
 
 def load_data(path):
-	"""
+    """
     Load dataset from a file in a DataFrame.
     :param path: path of file
     :return: DataFrame
-    """
-    
+    """    
     lbl = {'negative':0,
            'neutral':1,
           'positive':2}
@@ -63,7 +62,7 @@ def train_test_split_cv(inputs, n_iter):
     return train, test
 
 def create_examples(lines, set_type, labels=None):
-	"""
+    """
     Generate data for the BERT model
     :param lines: lists of tweets
     :param set_type: 'train' if lines are train data, 'test' otherwise
@@ -87,63 +86,62 @@ def create_examples(lines, set_type, labels=None):
     return examples
 
 def input_fn_builder(features, seq_length, is_training, drop_remainder):
-	"""
-    Creates an `input_fn` closure to be passed to TPUEstimator.
+    '''
+    Creates an input_fn closure to be passed to TPUEstimator.
     :return: examples
-    """
+    '''
+    all_input_ids = []
+    all_input_mask = []
+    all_segment_ids = []
+    all_label_ids = []
 
-  all_input_ids = []
-  all_input_mask = []
-  all_segment_ids = []
-  all_label_ids = []
+    for feature in features:
+        all_input_ids.append(feature.input_ids)
+        all_input_mask.append(feature.input_mask)
+        all_segment_ids.append(feature.segment_ids)
+        all_label_ids.append(feature.label_id)
 
-  for feature in features:
-    all_input_ids.append(feature.input_ids)
-    all_input_mask.append(feature.input_mask)
-    all_segment_ids.append(feature.segment_ids)
-    all_label_ids.append(feature.label_id)
+    def input_fn(params):
+        """The actual input function."""
+        print(params)
+        batch_size = 32
 
-  def input_fn(params):
-    """The actual input function."""
-    print(params)
-    batch_size = 32
+        num_examples = len(features)
 
-    num_examples = len(features)
+        d = tf.data.Dataset.from_tensor_slices({
+            "input_ids":
+                tf.constant(
+                    all_input_ids, shape=[num_examples, seq_length],
+                    dtype=tf.int32),
+            "input_mask":
+                tf.constant(
+                    all_input_mask,
+                    shape=[num_examples, seq_length],
+                    dtype=tf.int32),
+            "segment_ids":
+                tf.constant(
+                    all_segment_ids,
+                    shape=[num_examples, seq_length],
+                    dtype=tf.int32),
+            "label_ids":
+                tf.constant(all_label_ids, shape=[num_examples], dtype=tf.int32),
+        })
 
-    d = tf.data.Dataset.from_tensor_slices({
-        "input_ids":
-            tf.constant(
-                all_input_ids, shape=[num_examples, seq_length],
-                dtype=tf.int32),
-        "input_mask":
-            tf.constant(
-                all_input_mask,
-                shape=[num_examples, seq_length],
-                dtype=tf.int32),
-        "segment_ids":
-            tf.constant(
-                all_segment_ids,
-                shape=[num_examples, seq_length],
-                dtype=tf.int32),
-        "label_ids":
-            tf.constant(all_label_ids, shape=[num_examples], dtype=tf.int32),
-    })
+        if is_training:
+            d = d.repeat()
+            d = d.shuffle(buffer_size=100)
 
-    if is_training:
-      d = d.repeat()
-      d = d.shuffle(buffer_size=100)
+        d = d.batch(batch_size=batch_size, drop_remainder=drop_remainder)
+        return d
 
-    d = d.batch(batch_size=batch_size, drop_remainder=drop_remainder)
-    return d
-
-  return input_fn
+    return input_fn
 
 def train_estimator(train):
-	"""
+    '''
 	Creates the estimator and train it with dataset in input
 	:param train: dataset
 	:return: trained estimator 
-	"""
+	'''
     train_examples = create_examples(train['tweet'], 'train', labels=train['label'])
     
     print('TRAIN: ', len(train))
@@ -185,7 +183,7 @@ def train_estimator(train):
     return estimator
 
 def predict(test, estimator):
-	"""
+    """
 	Predicts test labels with estimator already trained
 	:param estimator: estimator already trained on train tweets
 	:param test: test dataset
@@ -207,7 +205,7 @@ def predict(test, estimator):
     return result
 
 def print_result(test, result):
-	"""
+    """
 	Prints accuracy, macro averaged recall, f1 (averaged only on negative and positive class) scores
 	:param test: real labels of tweets test
 	:param result: labels predicted  by estimator
@@ -239,12 +237,11 @@ def print_result(test, result):
     return (accuracy_avg,recall_avg, f1_avg)
 
 def cross_validation(train):
-	"""
+    """
 	Implements cross-validation MODE with parameters
 	:param train: train dataset
 	:return: final result, dictionary with scores 
 	"""
-
     accuracy_reps=[]
     recall_reps=[]
     f1_reps=[]
@@ -292,7 +289,7 @@ def cross_validation(train):
 
 
 def test_estimator(train, path_test):
-	""""
+    """"
 	Implements the test MODE
 	:param train: train dataset
 	:param path_test: direcory path of all tests
